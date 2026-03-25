@@ -56,6 +56,12 @@ export interface ContributorAvatarsData {
   total: number;
 }
 
+export interface CommitActivityWeek {
+  week: number;
+  total: number;
+  days: number[];
+}
+
 // ----- Generic cache wrapper -----
 
 export interface GithubCacheEntry<T> {
@@ -118,6 +124,10 @@ function repoContributorAvatarsKey(owner: string, repo: string) {
 
 function repoEventsKey(owner: string, repo: string) {
   return `repo_events:${normalizeRepoKey(owner, repo)}`;
+}
+
+function repoCommitActivityKey(owner: string, repo: string) {
+  return `repo_commit_activity:${normalizeRepoKey(owner, repo)}`;
 }
 
 // ----- Generic read/write helpers -----
@@ -205,6 +215,10 @@ export async function getRepoEvents(owner: string, repo: string) {
   return getCacheEntry<GitHubEvent[]>(repoEventsKey(owner, repo));
 }
 
+export async function getRepoCommitActivity(owner: string, repo: string) {
+  return getCacheEntry<CommitActivityWeek[]>(repoCommitActivityKey(owner, repo));
+}
+
 // ----- Public setters -----
 
 export async function setRepo(
@@ -214,7 +228,7 @@ export async function setRepo(
   data: GitHubRepository
 ) {
   const key = `gh:${userId}:repo:${normalizeRepoKey(owner, repo)}`;
-  return setCacheEntry(key, data);
+  return setCacheEntry(key, data, 300); // 5min — stars/forks/watchers change often
 }
 
 export async function setRepoIssues(
@@ -247,4 +261,12 @@ export async function setRepoEvents(
   data: GitHubEvent[]
 ) {
   return setCacheEntry(repoEventsKey(owner, repo), data, 300); // 5min TTL
+}
+
+export async function setRepoCommitActivity(
+  owner: string,
+  repo: string,
+  data: CommitActivityWeek[],
+) {
+  return setCacheEntry(repoCommitActivityKey(owner, repo), data, 3600); // 1h TTL
 }
