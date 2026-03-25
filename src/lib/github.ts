@@ -42,3 +42,12 @@ export async function fetchContributors(owner: string, repo: string) {
   });
   return data;
 }
+
+export async function fetchEvents(owner: string, repo: string) {
+  const { data } = await octokit.activity.listRepoEvents({
+    owner,
+    repo,
+    per_page: 30,
+  });
+  return data;
+}

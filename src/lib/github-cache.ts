@@ -31,6 +31,9 @@ export type GitHubRelease =
 export type GitHubWorkflow =
   RestEndpointMethodTypes["actions"]["listRepoWorkflows"]["response"]["data"]["workflows"][number];
 
+export type GitHubEvent =
+  RestEndpointMethodTypes["activity"]["listRepoEvents"]["response"]["data"][number];
+
 // ----- Custom types (not from Octokit) -----
 
 export interface RepoNavCounts {
@@ -111,6 +114,10 @@ function repoFileTreeKey(owner: string, repo: string) {
 
 function repoContributorAvatarsKey(owner: string, repo: string) {
   return `repo_contributor_avatars:${normalizeRepoKey(owner, repo)}`;
+}
+
+function repoEventsKey(owner: string, repo: string) {
+  return `repo_events:${normalizeRepoKey(owner, repo)}`;
 }
 
 // ----- Generic read/write helpers -----
@@ -194,6 +201,10 @@ export async function getRepoContributorAvatars(owner: string, repo: string) {
   return getCacheEntry<ContributorAvatarsData>(repoContributorAvatarsKey(owner, repo));
 }
 
+export async function getRepoEvents(owner: string, repo: string) {
+  return getCacheEntry<GitHubEvent[]>(repoEventsKey(owner, repo));
+}
+
 // ----- Public setters -----
 
 export async function setRepo(
@@ -228,4 +239,12 @@ export async function setRepoContributors(
   data: GitHubContributor[]
 ) {
   return setCacheEntry(repoContributorsKey(owner, repo), data);
+}
+
+export async function setRepoEvents(
+  owner: string,
+  repo: string,
+  data: GitHubEvent[]
+) {
+  return setCacheEntry(repoEventsKey(owner, repo), data, 300); // 5min TTL
 }

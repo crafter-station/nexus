@@ -5,14 +5,17 @@ import {
   getRepoContributors,
   getRepoContributorAvatars,
   getRepoNavCounts,
+  getRepoEvents,
   setRepo,
   setRepoIssues,
   setRepoPullRequests,
   setRepoContributors,
+  setRepoEvents,
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
   type GitHubContributor,
+  type GitHubEvent,
   type ContributorAvatarsData,
   type RepoNavCounts,
 } from "@/lib/github-cache";
@@ -21,6 +24,7 @@ import {
   fetchIssues,
   fetchPullRequests,
   fetchContributors,
+  fetchEvents,
 } from "@/lib/github";
 
 export interface RepoPageData {
@@ -30,6 +34,7 @@ export interface RepoPageData {
   contributors: GitHubContributor[];
   contributorAvatars: ContributorAvatarsData | null;
   navCounts: RepoNavCounts | null;
+  events: GitHubEvent[];
 }
 
 /**
@@ -52,6 +57,7 @@ export async function getRepoPageData(
     contributorsEntry,
     avatarsEntry,
     navCountsEntry,
+    eventsEntry,
   ] = await Promise.all([
     getRepo(userId, owner, repoName),
     getRepoIssues(owner, repoName),
@@ -59,12 +65,14 @@ export async function getRepoPageData(
     getRepoContributors(owner, repoName),
     getRepoContributorAvatars(owner, repoName),
     getRepoNavCounts(owner, repoName),
+    getRepoEvents(owner, repoName),
   ]);
 
   let repo = repoEntry?.data ?? null;
   let issues = issuesEntry?.data ?? [];
   let pullRequests = prsEntry?.data ?? [];
   let contributors = contributorsEntry?.data ?? [];
+  let events = eventsEntry?.data ?? [];
   const contributorAvatars = avatarsEntry?.data ?? null;
   const navCounts = navCountsEntry?.data ?? null;
 
@@ -116,6 +124,17 @@ export async function getRepoPageData(
     );
   }
 
+  if (events.length === 0 && !eventsEntry) {
+    fetches.push(
+      fetchEvents(owner, repoName)
+        .then((data) => {
+          events = data;
+          setRepoEvents(owner, repoName, data).catch(() => {});
+        })
+        .catch(() => {})
+    );
+  }
+
   // Wait for all API fetches to complete before rendering
   if (fetches.length > 0) {
     await Promise.all(fetches);
@@ -128,5 +147,6 @@ export async function getRepoPageData(
     contributors,
     contributorAvatars,
     navCounts,
+    events,
   };
 }

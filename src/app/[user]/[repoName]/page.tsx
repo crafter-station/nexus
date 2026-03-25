@@ -1,5 +1,5 @@
 import { getRepoPageData } from "./_lib/get-repo-data";
-import { mockActivityFeed, mockHeatmapData } from "./_lib/mock-data";
+import { mockHeatmapData } from "./_lib/mock-data";
 import TabNavigation from "./_components/tab-navigation";
 import StatsRow from "./_components/stats-row";
 import HighlightedActivity from "./_components/highlighted-activity";
@@ -15,7 +15,7 @@ export default async function RepoPage({
   params: Promise<{ user: string; repoName: string }>;
 }) {
   const { user, repoName } = await params;
-  const { repo, issues, pullRequests, navCounts } = await getRepoPageData(
+  const { repo, issues, pullRequests, navCounts, events } = await getRepoPageData(
     user,
     repoName
   );
@@ -78,7 +78,7 @@ export default async function RepoPage({
           {/* Left column: Activity */}
           <div className="space-y-6">
             <ActivityHeatmap data={mockHeatmapData} />
-            <ActivityFeed items={mockActivityFeed} />
+            <ActivityFeed events={events} />
           </div>
 
           {/* Middle column: Open PRs */}
