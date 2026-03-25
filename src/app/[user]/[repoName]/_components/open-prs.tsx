@@ -1,17 +1,7 @@
-import type { PullRequest } from "../_lib/types";
+import type { GitHubPullRequest } from "@/lib/github-cache";
+import { formatDate } from "../_lib/format";
 
-const avatarColors = [
-  "bg-green-600",
-  "bg-blue-500",
-  "bg-purple-500",
-  "bg-orange-500",
-  "bg-pink-500",
-  "bg-teal-500",
-  "bg-yellow-600",
-  "bg-red-500",
-];
-
-export default function OpenPRs({ pullRequests }: { pullRequests: PullRequest[] }) {
+export default function OpenPRs({ pullRequests }: { pullRequests: GitHubPullRequest[] }) {
   return (
     <div className="bg-surface rounded-xl border border-border-default">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-muted">
@@ -19,7 +9,7 @@ export default function OpenPRs({ pullRequests }: { pullRequests: PullRequest[] 
         <span className="text-xs text-accent">Newest +</span>
       </div>
       <div className="divide-y divide-border-muted">
-        {pullRequests.map((pr, i) => (
+        {pullRequests.map((pr) => (
           <div
             key={pr.id}
             className="px-5 py-3 hover:bg-surface-raised transition-colors"
@@ -47,16 +37,20 @@ export default function OpenPRs({ pullRequests }: { pullRequests: PullRequest[] 
                   {pr.title}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <div
-                    className={`w-4 h-4 rounded-full ${avatarColors[i % avatarColors.length]} flex items-center justify-center text-white text-[8px] font-bold`}
-                  >
-                    {pr.author[0].toUpperCase()}
-                  </div>
+                  {pr.user?.avatar_url ? (
+                    <img
+                      src={pr.user.avatar_url}
+                      alt={pr.user.login}
+                      className="w-4 h-4 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full bg-muted" />
+                  )}
                   <span className="text-xs text-muted truncate">
-                    {pr.author}
+                    {pr.user?.login ?? "unknown"}
                   </span>
                   <span className="text-xs text-subtle">&middot;</span>
-                  <span className="text-xs text-subtle">{pr.createdAt}</span>
+                  <span className="text-xs text-subtle">{formatDate(pr.created_at)}</span>
                 </div>
               </div>
             </div>

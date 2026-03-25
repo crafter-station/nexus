@@ -1,8 +1,6 @@
-import { mockHighlightedActivity } from "../_lib/mock-data";
+import type { GitHubIssue } from "@/lib/github-cache";
 
-export default function HighlightedActivity() {
-  const item = mockHighlightedActivity;
-
+export default function HighlightedActivity({ issue }: { issue: GitHubIssue }) {
   return (
     <div className="bg-surface rounded-xl border border-border-default p-5">
       <h3 className="text-sm font-medium text-foreground mb-4">
@@ -28,17 +26,27 @@ export default function HighlightedActivity() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm">
-            <span className="text-accent font-medium">#{item.number}</span>{" "}
-            <span className="text-foreground">{item.title}</span>
+            <span className="text-accent font-medium">#{issue.number}</span>{" "}
+            <span className="text-foreground">{issue.title}</span>
           </p>
-          <p className="text-xs text-muted mt-1">
-            <span className="inline-flex items-center gap-1">
-              <span className="w-4 h-4 rounded-full bg-teal-600 inline-flex items-center justify-center text-white text-[9px] font-bold">
-                {item.author[0].toUpperCase()}
+          {issue.user && (
+            <p className="text-xs text-muted mt-1">
+              <span className="inline-flex items-center gap-1">
+                {issue.user.avatar_url ? (
+                  <img
+                    src={issue.user.avatar_url}
+                    alt={issue.user.login}
+                    className="w-4 h-4 rounded-full"
+                  />
+                ) : (
+                  <span className="w-4 h-4 rounded-full bg-teal-600 inline-flex items-center justify-center text-white text-[9px] font-bold">
+                    {issue.user.login[0].toUpperCase()}
+                  </span>
+                )}
+                {issue.user.login}
               </span>
-              {item.author}
-            </span>
-          </p>
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-1 text-muted text-xs shrink-0">
           <svg
@@ -51,7 +59,7 @@ export default function HighlightedActivity() {
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
-          {item.comments}
+          {issue.comments}
         </div>
       </div>
     </div>

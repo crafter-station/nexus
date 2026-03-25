@@ -1,15 +1,15 @@
-import type { RepoData } from "../_lib/types";
+import { formatNumber } from "../_lib/format";
 
-function formatNumber(n: number): string {
-  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
-  return n.toString();
+export interface StatsData {
+  stars: number;
+  forks: number;
+  watchers: number;
+  openPRs: number;
+  openIssues: number;
 }
 
-const stats: {
-  key: keyof Pick<
-    RepoData,
-    "stars" | "forks" | "watchers" | "openPRs" | "openIssues"
-  >;
+const statsDef: {
+  key: keyof StatsData;
   label: string;
   icon: React.ReactNode;
 }[] = [
@@ -70,10 +70,10 @@ const stats: {
   },
 ];
 
-export default function StatsRow({ data }: { data: RepoData }) {
+export default function StatsRow({ data }: { data: StatsData }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-      {stats.map(({ key, label, icon }) => (
+      {statsDef.map(({ key, label, icon }) => (
         <div
           key={key}
           className="flex items-center gap-3 bg-surface rounded-xl border border-border-default p-4"

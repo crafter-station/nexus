@@ -1,17 +1,7 @@
-import type { Issue } from "../_lib/types";
+import type { GitHubIssue } from "@/lib/github-cache";
+import { formatDate } from "../_lib/format";
 
-const avatarColors = [
-  "bg-red-500",
-  "bg-cyan-500",
-  "bg-emerald-500",
-  "bg-amber-500",
-  "bg-violet-500",
-  "bg-rose-500",
-  "bg-sky-500",
-  "bg-lime-500",
-];
-
-export default function OpenIssues({ issues }: { issues: Issue[] }) {
+export default function OpenIssues({ issues }: { issues: GitHubIssue[] }) {
   return (
     <div className="bg-surface rounded-xl border border-border-default">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-muted">
@@ -19,7 +9,7 @@ export default function OpenIssues({ issues }: { issues: Issue[] }) {
         <span className="text-xs text-accent">Newest +</span>
       </div>
       <div className="divide-y divide-border-muted">
-        {issues.map((issue, i) => (
+        {issues.map((issue) => (
           <div
             key={issue.id}
             className="px-5 py-3 hover:bg-surface-raised transition-colors"
@@ -45,17 +35,21 @@ export default function OpenIssues({ issues }: { issues: Issue[] }) {
                   {issue.title}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <div
-                    className={`w-4 h-4 rounded-full ${avatarColors[i % avatarColors.length]} flex items-center justify-center text-white text-[8px] font-bold`}
-                  >
-                    {issue.author[0].toUpperCase()}
-                  </div>
+                  {issue.user?.avatar_url ? (
+                    <img
+                      src={issue.user.avatar_url}
+                      alt={issue.user.login}
+                      className="w-4 h-4 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-4 h-4 rounded-full bg-muted" />
+                  )}
                   <span className="text-xs text-muted truncate">
-                    {issue.author}
+                    {issue.user?.login ?? "unknown"}
                   </span>
                   <span className="text-xs text-subtle">&middot;</span>
                   <span className="text-xs text-subtle">
-                    {issue.createdAt}
+                    {formatDate(issue.created_at)}
                   </span>
                 </div>
               </div>
