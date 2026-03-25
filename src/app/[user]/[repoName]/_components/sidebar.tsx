@@ -1,8 +1,9 @@
 import type {
-  GitHubRepository,
-  GitHubContributor,
   ContributorAvatarsData,
+  GitHubContributor,
+  GitHubRepository,
 } from "@/lib/github-cache";
+import type { LatestCommitInfo } from "../_lib/get-repo-data";
 import {
   formatNumber,
   formatRelativeTime,
@@ -16,17 +17,18 @@ export default function Sidebar({
   repo,
   contributors,
   contributorAvatars,
+  latestCommit,
 }: {
   user: string;
   repoName: string;
   repo: GitHubRepository;
   contributors: GitHubContributor[];
   contributorAvatars: ContributorAvatarsData | null;
+  latestCommit: LatestCommitInfo | null;
 }) {
   const displayContributors =
     contributorAvatars?.contributors ?? contributors.slice(0, 12);
-  const totalContributors =
-    contributorAvatars?.total ?? contributors.length;
+  const totalContributors = contributorAvatars?.total ?? contributors.length;
 
   return (
     <div className="space-y-6">
@@ -40,7 +42,14 @@ export default function Sidebar({
           />
         ) : (
           <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="white"
+              strokeWidth="1.5"
+            >
               <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
             </svg>
           </div>
@@ -63,31 +72,106 @@ export default function Sidebar({
         </span>
       </div>
 
-      {/* Topics */}
-      {repo.topics && repo.topics.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {repo.topics.map((topic) => (
-            <span
-              key={topic}
-              className="px-2.5 py-0.5 rounded-full bg-accent-emphasis/15 text-accent text-xs font-medium hover:bg-accent-emphasis/25 transition-colors cursor-pointer"
-            >
-              {topic}
-            </span>
-          ))}
+      {/* Latest commit */}
+      <div className="space-y-4 text-left">
+        <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-subtle">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            className="shrink-0 text-subtle"
+            aria-hidden
+          >
+            <circle cx="8" cy="8" r="2.5" fill="currentColor" />
+            <path
+              d="M1.5 8h4M10.5 8H14.5"
+              stroke="currentColor"
+              strokeWidth="1.25"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span>Latest commit</span>
         </div>
-      )}
+        {latestCommit ? (
+          <a
+            href={latestCommit.htmlUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex gap-3 min-w-0 group"
+          >
+            {latestCommit.authorAvatarUrl ? (
+              <img
+                src={latestCommit.authorAvatarUrl}
+                alt=""
+                className="w-10 h-10 rounded-full shrink-0 ring-1 ring-border-default"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full shrink-0 bg-surface-raised flex items-center justify-center text-xs font-medium text-muted">
+                {(latestCommit.author || "?").slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0 flex-1 pt-0.5">
+              <p
+                className="text-[15px] leading-snug text-foreground truncate group-hover:text-accent transition-colors"
+                title={latestCommit.message}
+              >
+                {latestCommit.message.split("\n")[0] || "View commit"}
+              </p>
+              <p className="mt-1 text-sm text-muted">
+                <span className="text-foreground">{latestCommit.author}</span>
+                {latestCommit.committedAt ? (
+                  <>
+                    {" "}
+                    {formatRelativeTime(latestCommit.committedAt)}
+                  </>
+                ) : null}
+              </p>
+            </div>
+          </a>
+        ) : (
+          <p className="text-sm text-muted">No recent commits found.</p>
+        )}
+        {repo.topics && repo.topics.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-0.5 -mx-0.5 px-0.5 [scrollbar-color:rgba(63,63,70,0.6)_transparent]">
+            {repo.topics.map((topic) => (
+              <span
+                key={topic}
+                className="shrink-0 rounded-md bg-surface-raised px-2.5 py-1 text-[11px] font-mono text-muted border border-border-default"
+              >
+                {topic}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Action buttons */}
       <div className="space-y-2">
         <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-surface-raised hover:bg-surface text-sm font-medium transition-colors">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-warning">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="text-warning"
+          >
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
           <span>Starred</span>
-          <span className="text-muted">{formatNumber(repo.stargazers_count)}</span>
+          <span className="text-muted">
+            {formatNumber(repo.stargazers_count)}
+          </span>
         </button>
         <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-surface-raised hover:bg-surface text-sm transition-colors">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
             <polyline points="13 2 13 9 20 9" />
           </svg>
@@ -99,13 +183,31 @@ export default function Sidebar({
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-surface-raised hover:bg-surface text-sm transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
           </svg>
           Open on GitHub
         </a>
         <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border-default bg-surface-raised hover:bg-surface text-sm transition-colors">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <circle cx="12" cy="18" r="3" />
             <circle cx="6" cy="6" r="3" />
             <circle cx="18" cy="6" r="3" />
@@ -118,7 +220,9 @@ export default function Sidebar({
 
       {/* Info section */}
       <div className="space-y-3 text-sm border-t border-border-default pt-4">
-        <p className="text-xs text-subtle uppercase tracking-wider font-medium">Info</p>
+        <p className="text-xs text-subtle uppercase tracking-wider font-medium">
+          Info
+        </p>
         <div className="space-y-2.5">
           {repo.language && (
             <div className="flex items-center justify-between">
@@ -146,7 +250,9 @@ export default function Sidebar({
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted">Last push</span>
-            <span>{repo.pushed_at ? formatRelativeTime(repo.pushed_at) : "—"}</span>
+            <span>
+              {repo.pushed_at ? formatRelativeTime(repo.pushed_at) : "—"}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted">Size</span>
@@ -156,7 +262,11 @@ export default function Sidebar({
             <div className="flex items-center justify-between">
               <span className="text-muted">Homepage</span>
               <a
-                href={repo.homepage.startsWith("http") ? repo.homepage : `https://${repo.homepage}`}
+                href={
+                  repo.homepage.startsWith("http")
+                    ? repo.homepage
+                    : `https://${repo.homepage}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent truncate ml-4"

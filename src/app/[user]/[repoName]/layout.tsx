@@ -10,7 +10,7 @@ export default async function RepoLayout({
   params: Promise<{ user: string; repoName: string }>;
 }) {
   const { user, repoName } = await params;
-  const { repo, contributors, contributorAvatars } =
+  const { repo, contributors, contributorAvatars, latestCommit } =
     await getRepoPageData(user, repoName);
 
   return (
@@ -25,6 +25,7 @@ export default async function RepoLayout({
               repo={repo}
               contributors={contributors}
               contributorAvatars={contributorAvatars}
+              latestCommit={latestCommit}
             />
           ) : (
             <div className="text-muted text-sm">Repository not found in cache.</div>

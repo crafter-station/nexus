@@ -53,6 +53,32 @@ export async function fetchEvents(owner: string, repo: string) {
   return data;
 }
 
+export async function fetchLatestCommit(owner: string, repo: string): Promise<{
+  sha: string;
+  message: string;
+  author: string;
+  authorAvatarUrl: string | null;
+  committedAt: string;
+  htmlUrl: string;
+} | null> {
+  const { data } = await octokit.repos.listCommits({
+    owner,
+    repo,
+    per_page: 1,
+    page: 1,
+  });
+  const commit = data[0];
+  if (!commit) return null;
+  return {
+    sha: commit.sha,
+    message: commit.commit.message ?? "View commit",
+    author: commit.author?.login ?? commit.commit.author?.name ?? "unknown",
+    authorAvatarUrl: commit.author?.avatar_url ?? null,
+    committedAt: commit.commit.author?.date ?? commit.commit.committer?.date ?? "",
+    htmlUrl: commit.html_url,
+  };
+}
+
 function delay(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }

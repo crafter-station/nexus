@@ -1,10 +1,10 @@
-import { cache } from "react";
 import {
   fetchCommitActivityStats,
   fetchCommitAuthorDatesForHeatmap,
   fetchContributors,
   fetchEvents,
   fetchIssues,
+  fetchLatestCommit,
   fetchPullRequests,
   fetchRepo,
 } from "@/lib/github";
@@ -32,12 +32,22 @@ import {
   type GitHubRepository,
   type RepoNavCounts,
 } from "@/lib/github-cache";
+import { cache } from "react";
 import {
   HEATMAP_WEEKS,
   buildRepoActivityHeatmap,
   commitActivityWeeksFromAuthorDates,
   type RepoActivityHeatmap,
 } from "./build-heatmap";
+
+export interface LatestCommitInfo {
+  sha: string;
+  message: string;
+  author: string;
+  authorAvatarUrl: string | null;
+  committedAt: string;
+  htmlUrl: string;
+}
 
 export interface RepoPageData {
   repo: GitHubRepository | null;
@@ -47,7 +57,37 @@ export interface RepoPageData {
   contributorAvatars: ContributorAvatarsData | null;
   navCounts: RepoNavCounts | null;
   events: GitHubEvent[];
+  latestCommit: LatestCommitInfo | null;
   activityHeatmap: RepoActivityHeatmap;
+}
+
+function buildLatestCommitFromEvents(
+  owner: string,
+  repoName: string,
+  events: GitHubEvent[],
+): LatestCommitInfo | null {
+  for (const event of events) {
+    const push = event as unknown as {
+      type?: string;
+      created_at?: string;
+      actor?: { login?: string; avatar_url?: string | null };
+      payload?: { commits?: Array<{ sha?: string; message?: string }> };
+    };
+    if (push.type !== "PushEvent") continue;
+    const commits = push.payload?.commits;
+    if (!commits?.length) continue;
+    const last = commits[commits.length - 1];
+    if (!last?.sha) continue;
+    return {
+      sha: last.sha,
+      message: last.message ?? "View commit",
+      author: push.actor?.login ?? "unknown",
+      authorAvatarUrl: push.actor?.avatar_url ?? null,
+      committedAt: push.created_at ?? "",
+      htmlUrl: `https://github.com/${owner}/${repoName}/commit/${last.sha}`,
+    };
+  }
+  return null;
 }
 
 /**
@@ -157,8 +197,10 @@ export const getRepoPageData = cache(async function getRepoPageData(
   if (!commitActivityEntry || !hasUsableCommitCache) {
     fetches.push(
       (async () => {
-        let rows: CommitActivityWeek[] | null =
-          await fetchCommitActivityStats(owner, repoName);
+        let rows: CommitActivityWeek[] | null = await fetchCommitActivityStats(
+          owner,
+          repoName,
+        );
         if (!rows?.length) {
           const dates = await fetchCommitAuthorDatesForHeatmap(
             owner,
@@ -179,14 +221,10 @@ export const getRepoPageData = cache(async function getRepoPageData(
     await Promise.all(fetches);
   }
 
-  console.log("repo", repo);
-  console.log("issues", issues);
-  console.log("pullRequests", pullRequests);
-  console.log("contributors", contributors);
-  console.log("contributorAvatars", contributorAvatars);
-  console.log("navCounts", navCounts);
-  console.log("events", events);
-
+  let latestCommit = buildLatestCommitFromEvents(owner, repoName, events);
+  if (!latestCommit) {
+    latestCommit = await fetchLatestCommit(owner, repoName).catch(() => null);
+  }
   const activityHeatmap = buildRepoActivityHeatmap(commitActivity);
 
   return {
@@ -197,6 +235,7 @@ export const getRepoPageData = cache(async function getRepoPageData(
     contributorAvatars,
     navCounts,
     events,
+    latestCommit,
     activityHeatmap,
   };
 });
