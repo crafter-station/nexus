@@ -1,7 +1,11 @@
 import type { GitHubPullRequest } from "@/lib/github-cache";
 import { formatDate } from "../_lib/format";
 
-export default function OpenPRs({ pullRequests }: { pullRequests: GitHubPullRequest[] }) {
+export default function OpenPRs({
+  pullRequests,
+}: {
+  pullRequests: GitHubPullRequest[];
+}) {
   return (
     <div className="bg-surface rounded-xl border border-border-default">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-muted">
@@ -33,8 +37,7 @@ export default function OpenPRs({ pullRequests }: { pullRequests: GitHubPullRequ
               </svg>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-foreground truncate">
-                  <span className="text-muted">#{pr.number}</span>{" "}
-                  {pr.title}
+                  <span className="text-muted">#{pr.number}</span> {pr.title}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
                   {pr.user?.avatar_url ? (
@@ -50,7 +53,9 @@ export default function OpenPRs({ pullRequests }: { pullRequests: GitHubPullRequ
                     {pr.user?.login ?? "unknown"}
                   </span>
                   <span className="text-xs text-subtle">&middot;</span>
-                  <span className="text-xs text-subtle">{formatDate(pr.created_at)}</span>
+                  <span className="text-xs text-subtle">
+                    {formatDate(pr.created_at)}
+                  </span>
                 </div>
               </div>
             </div>

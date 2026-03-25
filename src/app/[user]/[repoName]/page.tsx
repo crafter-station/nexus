@@ -1,12 +1,11 @@
-import { getRepoPageData } from "./_lib/get-repo-data";
-import { mockHeatmapData } from "./_lib/mock-data";
-import TabNavigation from "./_components/tab-navigation";
-import StatsRow from "./_components/stats-row";
-import HighlightedActivity from "./_components/highlighted-activity";
-import ActivityHeatmap from "./_components/activity-heatmap";
 import ActivityFeed from "./_components/activity-feed";
-import OpenPRs from "./_components/open-prs";
+import ActivityHeatmap from "./_components/activity-heatmap";
+import HighlightedActivity from "./_components/highlighted-activity";
 import OpenIssues from "./_components/open-issues";
+import OpenPRs from "./_components/open-prs";
+import StatsRow from "./_components/stats-row";
+import TabNavigation from "./_components/tab-navigation";
+import { getRepoPageData } from "./_lib/get-repo-data";
 import type { Tab } from "./_lib/types";
 
 export default async function RepoPage({
@@ -15,10 +14,8 @@ export default async function RepoPage({
   params: Promise<{ user: string; repoName: string }>;
 }) {
   const { user, repoName } = await params;
-  const { repo, issues, pullRequests, navCounts, events } = await getRepoPageData(
-    user,
-    repoName
-  );
+  const { repo, issues, pullRequests, navCounts, events, activityHeatmap } =
+    await getRepoPageData(user, repoName);
 
   const prCount = navCounts?.pullRequests ?? pullRequests.length;
   const issueCount = navCounts?.issues ?? issues.length;
@@ -77,7 +74,7 @@ export default async function RepoPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column: Activity */}
           <div className="space-y-6">
-            <ActivityHeatmap data={mockHeatmapData} />
+            <ActivityHeatmap heatmap={activityHeatmap} />
             <ActivityFeed events={events} />
           </div>
 

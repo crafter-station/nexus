@@ -16,25 +16,57 @@ type EventType =
 
 const eventIcons: Partial<Record<EventType, React.ReactNode>> = {
   IssueCommentEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   ),
   IssuesEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <circle cx="12" cy="12" r="10" />
       <circle cx="12" cy="12" r="3" fill="currentColor" />
     </svg>
   ),
   PushEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="12" cy="12" r="4" />
       <line x1="1.05" y1="12" x2="7" y2="12" />
       <line x1="17.01" y1="12" x2="22.96" y2="12" />
     </svg>
   ),
   PullRequestEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="18" cy="18" r="3" />
       <circle cx="6" cy="6" r="3" />
       <path d="M13 6h3a2 2 0 0 1 2 2v7" />
@@ -42,17 +74,40 @@ const eventIcons: Partial<Record<EventType, React.ReactNode>> = {
     </svg>
   ),
   PullRequestReviewEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   ),
   PullRequestReviewCommentEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   ),
   CreateEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
@@ -63,7 +118,16 @@ const eventIcons: Partial<Record<EventType, React.ReactNode>> = {
     </svg>
   ),
   ForkEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="12" cy="18" r="3" />
       <circle cx="6" cy="6" r="3" />
       <circle cx="18" cy="6" r="3" />
@@ -72,7 +136,16 @@ const eventIcons: Partial<Record<EventType, React.ReactNode>> = {
     </svg>
   ),
   ReleaseEvent: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <line x1="7" y1="7" x2="7.01" y2="7" />
     </svg>
@@ -102,7 +175,9 @@ function getEventDescription(event: GitHubEvent): {
 
   switch (type) {
     case "IssueCommentEvent": {
-      const issue = payload.issue as { number: number; title: string } | undefined;
+      const issue = payload.issue as
+        | { number: number; title: string }
+        | undefined;
       return {
         action: "commented on",
         detail: issue?.title ?? "",
@@ -111,7 +186,9 @@ function getEventDescription(event: GitHubEvent): {
     }
     case "IssuesEvent": {
       const action = payload.action as string;
-      const issue = payload.issue as { number: number; title: string } | undefined;
+      const issue = payload.issue as
+        | { number: number; title: string }
+        | undefined;
       return {
         action: `${action} issue`,
         detail: issue?.title ?? "",
@@ -139,7 +216,9 @@ function getEventDescription(event: GitHubEvent): {
     }
     case "PullRequestEvent": {
       const action = payload.action as string;
-      const pr = payload.pull_request as { number: number; title: string } | undefined;
+      const pr = payload.pull_request as
+        | { number: number; title: string }
+        | undefined;
       return {
         action: `${action} pull request`,
         detail: pr?.title ?? "",
@@ -147,7 +226,9 @@ function getEventDescription(event: GitHubEvent): {
       };
     }
     case "PullRequestReviewEvent": {
-      const pr = payload.pull_request as { number: number; title: string } | undefined;
+      const pr = payload.pull_request as
+        | { number: number; title: string }
+        | undefined;
       return {
         action: "reviewed",
         detail: pr?.title ?? "",
@@ -155,7 +236,9 @@ function getEventDescription(event: GitHubEvent): {
       };
     }
     case "PullRequestReviewCommentEvent": {
-      const pr = payload.pull_request as { number: number; title: string } | undefined;
+      const pr = payload.pull_request as
+        | { number: number; title: string }
+        | undefined;
       return {
         action: "commented on review",
         detail: pr?.title ?? "",
@@ -175,7 +258,9 @@ function getEventDescription(event: GitHubEvent): {
     case "ForkEvent":
       return { action: "forked the repository", detail: "" };
     case "ReleaseEvent": {
-      const release = payload.release as { tag_name: string; name: string } | undefined;
+      const release = payload.release as
+        | { tag_name: string; name: string }
+        | undefined;
       return {
         action: "published release",
         detail: release?.name ?? release?.tag_name ?? "",
@@ -187,16 +272,21 @@ function getEventDescription(event: GitHubEvent): {
 }
 
 const defaultIcon = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+  >
     <circle cx="12" cy="12" r="10" />
   </svg>
 );
 
 export default function ActivityFeed({ events }: { events: GitHubEvent[] }) {
   if (events.length === 0) {
-    return (
-      <p className="text-sm text-muted py-4">No recent activity.</p>
-    );
+    return <p className="text-sm text-muted py-4">No recent activity.</p>;
   }
 
   return (
@@ -231,19 +321,13 @@ export default function ActivityFeed({ events }: { events: GitHubEvent[] }) {
                 </span>{" "}
                 {action}
               </p>
-              {number && (
-                <p className="text-sm text-accent">#{number}</p>
-              )}
+              {number && <p className="text-sm text-accent">#{number}</p>}
               {detail && (
-                <p className="text-xs text-muted mt-0.5 truncate">
-                  {detail}
-                </p>
+                <p className="text-xs text-muted mt-0.5 truncate">{detail}</p>
               )}
             </div>
             <span className="text-xs text-subtle shrink-0 mt-1">
-              {event.created_at
-                ? formatRelativeTime(event.created_at)
-                : ""}
+              {event.created_at ? formatRelativeTime(event.created_at) : ""}
             </span>
           </div>
         );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { RepoActivityHeatmap } from "../_lib/build-heatmap";
 
 const intensityClasses = [
   "bg-border-muted",
@@ -10,7 +11,15 @@ const intensityClasses = [
   "bg-success",
 ];
 
-export default function ActivityHeatmap({ data }: { data: number[][] }) {
+type ActivityScope = "all" | "mine";
+
+export default function ActivityHeatmap({
+  heatmap,
+}: {
+  heatmap: RepoActivityHeatmap;
+}) {
+  const { levels: data, dayCounts, cellDateLabels, totalCommits } = heatmap;
+  const [scope, setScope] = useState<ActivityScope>("all");
   const [tooltip, setTooltip] = useState<{
     week: number;
     day: number;
@@ -18,30 +27,52 @@ export default function ActivityHeatmap({ data }: { data: number[][] }) {
     y: number;
   } | null>(null);
 
-  const totalCommits = data.reduce(
-    (sum, week) => sum + week.reduce((s, d) => s + d, 0),
-    0
-  );
+  const totalLabel =
+    totalCommits >= 1000
+      ? `${(totalCommits / 1000).toFixed(1)}k`
+      : String(totalCommits);
 
   return (
     <div className="bg-surface rounded-xl border border-border-default p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-foreground">
-          Recent Activity
-        </h3>
-        <div className="flex items-center gap-2 text-xs text-muted">
-          <span>All</span>
-          <span className="text-foreground font-medium border-b border-accent pb-0.5">
+        <h3 className="text-sm font-medium text-foreground">Recent Activity</h3>
+        <div
+          className="flex items-center gap-1 text-xs"
+          role="tablist"
+          aria-label="Activity scope"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={scope === "all"}
+            onClick={() => setScope("all")}
+            className={`px-2 py-0.5 rounded-md transition-colors ${
+              scope === "all"
+                ? "text-foreground font-medium border-b border-accent pb-0.5 rounded-b-none"
+                : "text-muted hover:text-foreground"
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={scope === "mine"}
+            aria-disabled
+            title="Coming soon: your commits only"
+            onClick={() => {
+              /* Mine: filter by signed-in user — not implemented yet */
+            }}
+            className="px-2 py-0.5 rounded-md text-muted opacity-70 hover:opacity-100 cursor-pointer"
+          >
             Mine
-          </span>
+          </button>
         </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-muted mb-2">
         <span>Commits &middot; {data.length} weeks</span>
-        <span>
-          {(totalCommits / 100).toFixed(1)}k total
-        </span>
+        <span>{totalLabel} total</span>
       </div>
 
       <div className="relative">
@@ -70,15 +101,24 @@ export default function ActivityHeatmap({ data }: { data: number[][] }) {
                 }}
                 onMouseLeave={() => setTooltip(null)}
               />
-            ))
+            )),
           )}
         </div>
 
         {tooltip && (
-          <div className="fixed z-50 px-2 py-1 bg-foreground text-background text-xs rounded shadow-lg pointer-events-none -translate-x-1/2 -translate-y-full -mt-2"
+          <div
+            className="fixed z-50 px-2 py-1.5 bg-foreground text-background text-xs rounded shadow-lg pointer-events-none -translate-x-1/2 -translate-y-full -mt-2 max-w-[200px] text-center leading-snug"
             style={{ left: tooltip.x, top: tooltip.y }}
           >
-            {data[tooltip.week][tooltip.day]} contributions
+            <span className="block font-medium mt-0.5">
+              {dayCounts[tooltip.week]?.[tooltip.day] ?? 0}{" "}
+              {dayCounts[tooltip.week]?.[tooltip.day] === 1
+                ? "commit"
+                : "commits"}
+            </span>
+            <span className="block text-background/85">
+              {cellDateLabels[tooltip.week]?.[tooltip.day] ?? "—"}
+            </span>
           </div>
         )}
       </div>
@@ -86,10 +126,7 @@ export default function ActivityHeatmap({ data }: { data: number[][] }) {
       <div className="flex items-center justify-end gap-1.5 mt-3 text-xs text-muted">
         <span>Less</span>
         {intensityClasses.map((cls, i) => (
-          <div
-            key={i}
-            className={`w-3 h-3 rounded-sm ${cls}`}
-          />
+          <div key={i} className={`w-3 h-3 rounded-sm ${cls}`} />
         ))}
         <span>More</span>
       </div>
