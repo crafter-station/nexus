@@ -1,11 +1,11 @@
-import { getRepoPageData } from "./_lib/get-repo-data";
-import TabNavigation from "./_components/tab-navigation";
-import StatsRow from "./_components/stats-row";
-import HighlightedActivity from "./_components/highlighted-activity";
-import ActivityHeatmap from "./_components/activity-heatmap";
 import ActivityFeed from "./_components/activity-feed";
-import OpenPRs from "./_components/open-prs";
+import ActivityHeatmap from "./_components/activity-heatmap";
+import HighlightedActivity from "./_components/highlighted-activity";
 import OpenIssues from "./_components/open-issues";
+import OpenPRs from "./_components/open-prs";
+import StatsRow from "./_components/stats-row";
+import TabNavigation from "./_components/tab-navigation";
+import { getRepoPageData } from "./_lib/get-repo-data";
 import type { Tab } from "./_lib/types";
 
 export default async function RepoPage({

@@ -53,7 +53,10 @@ export async function fetchEvents(owner: string, repo: string) {
   return data;
 }
 
-export async function fetchLatestCommit(owner: string, repo: string): Promise<{
+export async function fetchLatestCommit(
+  owner: string,
+  repo: string,
+): Promise<{
   sha: string;
   message: string;
   author: string;
@@ -74,7 +77,8 @@ export async function fetchLatestCommit(owner: string, repo: string): Promise<{
     message: commit.commit.message ?? "View commit",
     author: commit.author?.login ?? commit.commit.author?.name ?? "unknown",
     authorAvatarUrl: commit.author?.avatar_url ?? null,
-    committedAt: commit.commit.author?.date ?? commit.commit.committer?.date ?? "",
+    committedAt:
+      commit.commit.author?.date ?? commit.commit.committer?.date ?? "",
     htmlUrl: commit.html_url,
   };
 }
@@ -106,7 +110,11 @@ export async function fetchCommitActivityStats(
         "GET /repos/{owner}/{repo}/stats/commit_activity",
         { owner, repo },
       );
-      if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
+      if (
+        res.status === 200 &&
+        Array.isArray(res.data) &&
+        res.data.length > 0
+      ) {
         return res.data as CommitActivityWeek[];
       }
       await delay(2500);

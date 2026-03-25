@@ -35,7 +35,7 @@ function formatHeatmapCellDateUtc(weekStartSec: number, rowSunFirst: number): st
     return "—";
   }
   const ms = weekStartSec * 1000 + rowSunFirst * MS_DAY;
-  return new Date(ms).toLocaleDateString("es", {
+  return new Date(ms).toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     timeZone: "UTC",
